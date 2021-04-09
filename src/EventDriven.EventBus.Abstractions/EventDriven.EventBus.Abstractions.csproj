@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.0-rc1</Version>
+    <Description>An event bus abstraction layer.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>event-bus.png</PackageIcon>
+    <Company>Dapr .NET Extensions</Company>
+    <Authors>Tony Sneed</Authors>
+    <PackageProjectUrl>https://github.com/event-driven-dotnet/EventDriven.EventBus.Abstractions</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/event-driven-dotnet/EventDriven.EventBus.Abstractions.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>event-bus</PackageTags>
+    <PackageReleaseNotes>https://github.com/event-driven-dotnet/EventDriven.EventBus.Abstractions/releases/tag/v1.0.0-rc1</PackageReleaseNotes>
+    <PackageId>EventDriven.EventBus.Abstractions</PackageId>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin/Release/EventBus.Abstractions.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin/Debug/EventBus.Abstractions.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\images\event-bus.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
