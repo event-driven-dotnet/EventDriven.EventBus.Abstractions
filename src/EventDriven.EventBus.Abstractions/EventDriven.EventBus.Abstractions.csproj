@@ -6,13 +6,13 @@
     <Version>1.0.0-rc1</Version>
     <Description>An event bus abstraction layer.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIcon>event-bus.png</PackageIcon>
+    <PackageIcon>eda-logo.jpeg</PackageIcon>
     <Company>Dapr .NET Extensions</Company>
     <Authors>Tony Sneed</Authors>
     <PackageProjectUrl>https://github.com/event-driven-dotnet/EventDriven.EventBus.Abstractions</PackageProjectUrl>
     <RepositoryUrl>https://github.com/event-driven-dotnet/EventDriven.EventBus.Abstractions.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>event-bus</PackageTags>
+    <PackageTags>event-bus event-driven-architecture</PackageTags>
     <PackageReleaseNotes>https://github.com/event-driven-dotnet/EventDriven.EventBus.Abstractions/releases/tag/v1.0.0-rc1</PackageReleaseNotes>
     <PackageId>EventDriven.EventBus.Abstractions</PackageId>
   </PropertyGroup>
@@ -26,7 +26,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\images\event-bus.png">
+    <None Include="..\..\images\eda-logo.jpeg">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
