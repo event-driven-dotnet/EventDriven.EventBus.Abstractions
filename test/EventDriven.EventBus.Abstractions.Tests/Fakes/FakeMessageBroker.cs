@@ -7,10 +7,13 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
     {
         public Dictionary<string, List<IIntegrationEventHandler>> Topics { get; } = new();
 
-        public void Subscribe(IIntegrationEventHandler handler, string topic = null, string prefix = null)
+        public void Subscribe(
+            IIntegrationEventHandler handler,
+            string topic = null,
+            string prefix = null)
         {
-            var topicName = topic ?? handler.Topic;
-            if (!string.IsNullOrWhiteSpace(prefix)) topicName = $"{prefix}.{topicName}";
+            var topicName = string.IsNullOrWhiteSpace(topic) ? handler.Topic : topic;
+            topicName = string.IsNullOrWhiteSpace(prefix) ? topicName : $"{prefix}.{topicName}";
             if (Topics.TryGetValue(topicName, out var handlers))
             {
                 handlers.Add(handler);
@@ -21,12 +24,12 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
             }
         }
 
-        public Task PublishEventAsync<TIntegrationEvent>(TIntegrationEvent @event, string topic, string prefix)
+        public Task PublishEventAsync<TIntegrationEvent>(
+            TIntegrationEvent @event,
+            string topic)
             where TIntegrationEvent : IIntegrationEvent
         {
-            var topicName = topic;
-            if (!string.IsNullOrWhiteSpace(prefix)) topicName = $"{prefix}.{topicName}";
-            var handlers = Topics[topicName];
+            var handlers = Topics[topic];
             if (handlers != null)
             {
                 foreach (var handler in handlers)

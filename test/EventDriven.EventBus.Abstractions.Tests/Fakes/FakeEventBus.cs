@@ -16,8 +16,8 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
             string topic = null,
             string prefix = null)
         {
-            var topicName = topic ?? @event.GetType().Name;
-            await _messageBroker.PublishEventAsync(@event, topicName, prefix);
+            var topicName = GetTopicName(@event.GetType(), topic, prefix);
+            await _messageBroker.PublishEventAsync(@event, topicName);
         }
     }
 }
