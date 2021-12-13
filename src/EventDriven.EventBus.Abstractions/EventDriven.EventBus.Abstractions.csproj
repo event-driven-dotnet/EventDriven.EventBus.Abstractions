@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <Description>An event bus abstraction layer.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>eda-logo.jpeg</PackageIcon>
@@ -13,7 +13,7 @@
     <RepositoryUrl>https://github.com/event-driven-dotnet/EventDriven.EventBus.Abstractions.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>event-bus event-driven event-driven-architecture</PackageTags>
-    <PackageReleaseNotes>https://github.com/event-driven-dotnet/EventDriven.EventBus.Abstractions/releases/tag/v1.0.0</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/event-driven-dotnet/EventDriven.EventBus.Abstractions/releases/tag/v1.1.0</PackageReleaseNotes>
     <PackageId>EventDriven.EventBus.Abstractions</PackageId>
   </PropertyGroup>
 
