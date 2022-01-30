@@ -7,7 +7,7 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
     {
         public Dictionary<string, List<IIntegrationEventHandler>> Topics { get; } = new();
 
-        public void Subscribe(
+        public virtual void Subscribe(
             IIntegrationEventHandler handler,
             string topic = null,
             string prefix = null)
@@ -24,7 +24,7 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
             }
         }
 
-        public Task PublishEventAsync<TIntegrationEvent>(
+        public virtual Task PublishEventAsync<TIntegrationEvent>(
             TIntegrationEvent @event,
             string topic)
             where TIntegrationEvent : IIntegrationEvent

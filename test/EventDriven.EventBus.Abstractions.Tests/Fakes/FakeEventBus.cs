@@ -4,11 +4,15 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
 {
     public class FakeEventBus : EventBus
     {
-        private readonly FakeMessageBroker _messageBroker;
+        public EventBusOptions EventBusOptions { get; }
+        protected FakeMessageBroker MessageBroker { get; }
 
-        public FakeEventBus(FakeMessageBroker messageBroker)
+        public FakeEventBus(FakeMessageBroker messageBroker,
+            EventBusOptions eventBusOptions) :
+            base(eventBusOptions)
         {
-            _messageBroker = messageBroker;
+            EventBusOptions = eventBusOptions;
+            MessageBroker = messageBroker;
         }
 
         public override async Task PublishAsync<TIntegrationEvent>(
@@ -17,7 +21,7 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
             string prefix = null)
         {
             var topicName = GetTopicName(@event.GetType(), topic, prefix);
-            await _messageBroker.PublishEventAsync(@event, topicName);
+            await MessageBroker.PublishEventAsync(@event, topicName);
         }
     }
 }

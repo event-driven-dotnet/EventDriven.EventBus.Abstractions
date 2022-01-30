@@ -6,9 +6,9 @@ namespace EventDriven.EventBus.Abstractions
     public abstract record IntegrationEvent : IIntegrationEvent
     {
         ///<inheritdoc/>
-        public string Id { get; init; } = Guid.NewGuid().ToString();
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
         ///<inheritdoc/>
-        public DateTime CreationDate { get; init; } = DateTime.UtcNow;
+        public DateTime CreationDate { get; set; } = DateTime.UtcNow;
     }
 }

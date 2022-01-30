@@ -10,11 +10,11 @@ namespace EventDriven.EventBus.Abstractions
         /// <summary>
         /// Unique event identifier.
         /// </summary>
-        string Id { get; }
+        string Id { get; set; }
 
         /// <summary>
         /// Event creation date.
         /// </summary>
-        DateTime CreationDate { get; }
+        DateTime CreationDate { get; set; }
     }
 }

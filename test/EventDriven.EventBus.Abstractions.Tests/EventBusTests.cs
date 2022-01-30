@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using EventDriven.EventBus.Abstractions.Tests.Fakes;
@@ -27,8 +28,9 @@ namespace EventDriven.EventBus.Abstractions.Tests
             messageBroker.Subscribe(fakeHandler1, topicName, prefix);
             messageBroker.Subscribe(fakeHandler2, topicName, prefix);
 
-            // Create service bus
-            var eventBus = new FakeEventBus(messageBroker);
+            // Create event bus
+            var options = new EventBusOptions { EnableEventCache = false };
+            var eventBus = new FakeEventBus(messageBroker, options);
             eventBus.Subscribe(fakeHandler1, topicName, prefix);
             eventBus.Subscribe(fakeHandler2, topicName, prefix);
 
@@ -39,6 +41,42 @@ namespace EventDriven.EventBus.Abstractions.Tests
             // Assert
             Assert.Equal(@event.CreationDate, state.Date);
             Assert.Equal("B", state.Data);
+        }
+        
+        [Theory]
+        [InlineData(false, false, 2)]
+        [InlineData(true, false, 2)]
+        [InlineData(true, true, 2)]
+        public async Task EventBus_With_Cache_Should_Invoke_Event_Handlers(bool enableCache, bool expire, int iterations)
+        {
+            // Create handler
+            var initial = 1;
+            var state = new FakeState { Value = initial };
+            var fakeHandler3 = new FakeEventHandler3(state);
+
+            // Create message broker
+            const string prefix = "v1";
+            var options = new EventBusOptions
+            {
+                EnableEventCache = enableCache,
+                EventCacheTimeout = expire ? TimeSpan.FromMilliseconds(200) : TimeSpan.FromSeconds(60)
+            };
+            var messageBroker = new FakeCachingMessageBroker(options);
+            messageBroker.Subscribe(fakeHandler3, null, prefix);
+
+            // Create event bus
+            var eventBus = new FakeRepeatingEventBus(messageBroker, options, iterations, expire);
+            messageBroker.EventBus = eventBus;
+            eventBus.Subscribe(fakeHandler3, null, prefix);
+
+            // Publish to service bus
+            var @event = new FakeIntegrationEvent(string.Empty);
+            await eventBus.PublishAsync(@event, null, prefix);
+
+            // Assert
+            var expected = enableCache ? initial + 1 : initial + iterations;
+            if (enableCache && expire) expected = initial + iterations;
+            Assert.Equal(expected, state.Value);
         }
         
         [Theory]
@@ -61,8 +99,9 @@ namespace EventDriven.EventBus.Abstractions.Tests
             messageBroker.Subscribe(fakeHandler1, topicName, prefix);
             messageBroker.Subscribe(fakeHandler2, topicName, prefix);
 
-            // Create service bus
-            var eventBus = new FakeEventBus(messageBroker);
+            // Create event bus
+            var options = new EventBusOptions { EnableEventCache = false };
+            var eventBus = new FakeEventBus(messageBroker, options);
             eventBus.Subscribe(fakeHandler1, topicName, prefix);
             eventBus.Subscribe(fakeHandler2, topicName, prefix);
 

@@ -9,6 +9,11 @@ namespace EventDriven.EventBus.Abstractions
     public interface IEventBus
     {
         /// <summary>
+        /// Event cache for idempotency.
+        /// </summary>
+        EventCache EventCache { get; }
+
+        /// <summary>
         /// List of topics with associated event handlers.
         /// </summary>
         Dictionary<string, List<IIntegrationEventHandler>> Topics { get; }

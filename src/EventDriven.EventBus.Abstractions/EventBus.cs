@@ -7,8 +7,21 @@ namespace EventDriven.EventBus.Abstractions
     ///<inheritdoc/>
     public abstract class EventBus : IEventBus
     {
+        /// <inheritdoc />
+        public EventCache EventCache { get; }
+
         ///<inheritdoc/>
         public Dictionary<string, List<IIntegrationEventHandler>> Topics { get; } = new();
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="eventBusOptions">Event bus options.</param>
+        protected EventBus(EventBusOptions eventBusOptions)
+        {
+            var options = eventBusOptions ?? throw new ArgumentNullException(nameof(eventBusOptions));
+            EventCache = new EventCache(options);
+        }
 
         ///<inheritdoc/>
         public virtual void Subscribe(

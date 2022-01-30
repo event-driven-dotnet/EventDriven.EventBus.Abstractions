@@ -6,5 +6,6 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
     {
         public DateTime Date { get; set; }
         public string Data { get; set; }
+        public int Value { get; set; }
     }
 }
