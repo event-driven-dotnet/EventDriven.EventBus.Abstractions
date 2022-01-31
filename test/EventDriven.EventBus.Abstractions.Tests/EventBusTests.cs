@@ -29,8 +29,7 @@ namespace EventDriven.EventBus.Abstractions.Tests
             messageBroker.Subscribe(fakeHandler2, topicName, prefix);
 
             // Create event bus
-            var options = new EventBusOptions { EnableEventCache = false };
-            var eventBus = new FakeEventBus(messageBroker, options);
+            var eventBus = new FakeEventBus(messageBroker);
             eventBus.Subscribe(fakeHandler1, topicName, prefix);
             eventBus.Subscribe(fakeHandler2, topicName, prefix);
 
@@ -61,7 +60,8 @@ namespace EventDriven.EventBus.Abstractions.Tests
                 EnableEventCache = enableCache,
                 EventCacheTimeout = expire ? TimeSpan.FromMilliseconds(200) : TimeSpan.FromSeconds(60)
             };
-            var messageBroker = new FakeCachingMessageBroker(options);
+            var eventCache = new InMemoryEventCache(options);
+            var messageBroker = new FakeCachingMessageBroker(eventCache);
             messageBroker.Subscribe(fakeHandler3, null, prefix);
 
             // Create event bus
@@ -100,8 +100,7 @@ namespace EventDriven.EventBus.Abstractions.Tests
             messageBroker.Subscribe(fakeHandler2, topicName, prefix);
 
             // Create event bus
-            var options = new EventBusOptions { EnableEventCache = false };
-            var eventBus = new FakeEventBus(messageBroker, options);
+            var eventBus = new FakeEventBus(messageBroker);
             eventBus.Subscribe(fakeHandler1, topicName, prefix);
             eventBus.Subscribe(fakeHandler2, topicName, prefix);
 

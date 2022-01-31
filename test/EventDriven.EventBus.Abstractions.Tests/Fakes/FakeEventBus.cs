@@ -4,14 +4,10 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
 {
     public class FakeEventBus : EventBus
     {
-        public EventBusOptions EventBusOptions { get; }
         protected FakeMessageBroker MessageBroker { get; }
 
-        public FakeEventBus(FakeMessageBroker messageBroker,
-            EventBusOptions eventBusOptions) :
-            base(eventBusOptions)
+        public FakeEventBus(FakeMessageBroker messageBroker)
         {
-            EventBusOptions = eventBusOptions;
             MessageBroker = messageBroker;
         }
 

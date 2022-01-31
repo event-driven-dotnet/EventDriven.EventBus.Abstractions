@@ -3,40 +3,32 @@ using System.Collections.Concurrent;
 
 namespace EventDriven.EventBus.Abstractions;
 
-/// <summary>
-/// Event cache to enable idempotency.
-/// </summary>
-public class EventCache
+/// <inheritdoc />
+public class InMemoryEventCache : IEventCache
 {
     /// <summary>
     /// Thread-safe event cache.
     /// </summary>
-    protected ConcurrentDictionary<string, EventHandling> Cache { get; set; } = new();
+    protected ConcurrentDictionary<string, EventHandling> Cache { get; } = new();
 
-    /// <summary>
-    /// Event bus options.
-    /// </summary>
-    protected EventBusOptions EventBusOptions { get; set; }
+    /// <inheritdoc />
+    public EventBusOptions EventBusOptions { get; set; }
 
     /// <summary>
     /// Constructor.
     /// </summary>
     /// <param name="eventBusOptions">Event bus options.</param>
-    public EventCache(EventBusOptions eventBusOptions)
+    public InMemoryEventCache(EventBusOptions eventBusOptions)
     {
         EventBusOptions = eventBusOptions;
     }
 
-    /// <summary>
-    /// Attempts to add the integration event to the event cache.
-    /// </summary>
-    /// <param name="event">The integration event</param>
-    /// <returns>
-    /// True if the event was added to the event cache.
-    /// False if the event is in the cache and not expired or it cannot be removed. 
-    /// </returns>
+    /// <inheritdoc />
     public bool TryAdd(IIntegrationEvent @event)
     {
+        // Return true if not enabled
+        if (!EventBusOptions.EnableEventCache) return true;
+        
         // Return false if event exists and is not expired
         bool expired = false;
         if (Cache.TryGetValue(@event.Id, out var existing))
