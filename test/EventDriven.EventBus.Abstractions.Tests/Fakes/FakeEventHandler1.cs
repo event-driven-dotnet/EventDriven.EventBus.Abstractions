@@ -15,6 +15,7 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
         {
             // Mutate State Data
             State.Data = @event.Data;
+            State.Value++;
             return Task.CompletedTask;
         }
     }

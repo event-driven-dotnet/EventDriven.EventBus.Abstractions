@@ -4,14 +4,14 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
 {
     public class FakeCachingMessageBroker : FakeMessageBroker
     {
-        private readonly IEventCache _eventCache;
+        public IEventCache EventCache { get; }
 
         public IEventBus EventBus { get; set; }
 
         public FakeCachingMessageBroker(
             IEventCache eventCache)
         {
-            _eventCache = eventCache;
+            EventCache = eventCache;
         }
         
         public override Task PublishEventAsync<TIntegrationEvent>(
@@ -22,7 +22,7 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
             if (handlers == null) return Task.CompletedTask;
             foreach (var handler in handlers)
             {
-                if (_eventCache.TryAdd(@event))
+                if (EventCache.TryAdd(@event))
                     handler.HandleAsync(@event);
             }
             return Task.CompletedTask;

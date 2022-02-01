@@ -1,30 +1,90 @@
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace EventDriven.EventBus.Abstractions;
 
-/// <inheritdoc />
+/// <summary>
+/// Event cache to enable idempotency.
+/// </summary>
 public class InMemoryEventCache : IEventCache
 {
+    private readonly object _syncRoot = new object();
+    
     /// <summary>
     /// Thread-safe event cache.
     /// </summary>
     protected ConcurrentDictionary<string, EventHandling> Cache { get; } = new();
 
+    /// <summary>
+    /// Cleanup timer.
+    /// </summary>
+    protected Timer CleanupTimer { get; }
+
+    /// <summary>
+    /// Lock timeout.
+    /// </summary>
+    protected TimeSpan LockTimeout { get; set; } = TimeSpan.FromSeconds(60);
+    
     /// <inheritdoc />
     public EventBusOptions EventBusOptions { get; set; }
+
+    /// <summary>
+    /// Cancellation token.
+    /// </summary>
+    public CancellationToken CancellationToken { get; }
 
     /// <summary>
     /// Constructor.
     /// </summary>
     /// <param name="eventBusOptions">Event bus options.</param>
-    public InMemoryEventCache(EventBusOptions eventBusOptions)
+    /// <param name="cancellationToken">Cancellation token</param>
+    public InMemoryEventCache(
+        EventBusOptions eventBusOptions,
+        CancellationToken cancellationToken = default)
     {
         EventBusOptions = eventBusOptions;
+        CancellationToken = cancellationToken;
+        async void TimerCallback(object state) => await CleanupEventCacheAsync();
+        if (EventBusOptions.EnableEventCacheCleanup)
+            CleanupTimer = new Timer(TimerCallback, null, TimeSpan.Zero, EventBusOptions.EventCacheCleanupInterval);
+    }
+
+    /// <summary>
+    /// Cleans up event cache.
+    /// </summary>
+    /// <returns>Task that will complete when the operation has completed.</returns>
+    protected virtual async Task CleanupEventCacheAsync()
+    {
+        try
+        {
+            if (Monitor.TryEnter(_syncRoot, LockTimeout))
+            {
+                // End timer and exit if cache cleanup disabled or cancellation pending
+                if (!EventBusOptions.EnableEventCacheCleanup || CancellationToken.IsCancellationRequested)
+                {
+                    await CleanupTimer.DisposeAsync();
+                    return;
+                }
+
+                // Remove expired events
+                var expired = Cache
+                    .Where(kvp =>
+                        kvp.Value.EventHandledTimeout < DateTime.UtcNow - kvp.Value.EventHandledTime);
+                foreach (var keyValuePair in expired)
+                    Cache.TryRemove(keyValuePair);
+            }
+        }
+        finally
+        {
+            Monitor.Exit(_syncRoot);
+        }
     }
 
     /// <inheritdoc />
-    public bool TryAdd(IIntegrationEvent @event)
+    public virtual bool TryAdd(IIntegrationEvent @event)
     {
         // Return true if not enabled
         if (!EventBusOptions.EnableEventCache) return true;

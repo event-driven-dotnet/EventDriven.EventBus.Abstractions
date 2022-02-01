@@ -15,6 +15,7 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
         {
             // Mutate State Date
             State.Date = @event.CreationDate;
+            State.Value++;
             return Task.CompletedTask;
         }
     }
