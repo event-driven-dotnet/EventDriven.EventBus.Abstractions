@@ -25,4 +25,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="EventDriven.Utilities" Version="1.0.0-beta2" />
+  </ItemGroup>
+
 </Project>

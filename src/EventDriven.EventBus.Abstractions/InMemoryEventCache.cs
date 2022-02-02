@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EventDriven.Utilities;
 
 namespace EventDriven.EventBus.Abstractions;
 
@@ -58,28 +59,21 @@ public class InMemoryEventCache : IEventCache
     /// <returns>Task that will complete when the operation has completed.</returns>
     protected virtual async Task CleanupEventCacheAsync()
     {
-        try
+        using (new TimedLock(_syncRoot).Lock(LockTimeout))
         {
-            if (Monitor.TryEnter(_syncRoot, LockTimeout))
+            // End timer and exit if cache cleanup disabled or cancellation pending
+            if (!EventBusOptions.EnableEventCacheCleanup || CancellationToken.IsCancellationRequested)
             {
-                // End timer and exit if cache cleanup disabled or cancellation pending
-                if (!EventBusOptions.EnableEventCacheCleanup || CancellationToken.IsCancellationRequested)
-                {
-                    await CleanupTimer.DisposeAsync();
-                    return;
-                }
-
-                // Remove expired events
-                var expired = Cache
-                    .Where(kvp =>
-                        kvp.Value.EventHandledTimeout < DateTime.UtcNow - kvp.Value.EventHandledTime);
-                foreach (var keyValuePair in expired)
-                    Cache.TryRemove(keyValuePair);
+                await CleanupTimer.DisposeAsync();
+                return;
             }
-        }
-        finally
-        {
-            Monitor.Exit(_syncRoot);
+
+            // Remove expired events
+            var expired = Cache
+                .Where(kvp =>
+                    kvp.Value.EventHandledTimeout < DateTime.UtcNow - kvp.Value.EventHandledTime);
+            foreach (var keyValuePair in expired)
+                Cache.TryRemove(keyValuePair);
         }
     }
 
