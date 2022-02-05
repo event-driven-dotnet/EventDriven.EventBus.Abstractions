@@ -78,7 +78,7 @@ public class InMemoryEventCache : IEventCache
     }
 
     /// <inheritdoc />
-    public virtual bool TryAdd(IIntegrationEvent @event)
+    public virtual bool TryAdd(IntegrationEvent @event)
     {
         // Return true if not enabled
         if (!EventCacheOptions.EnableEventCache) return true;

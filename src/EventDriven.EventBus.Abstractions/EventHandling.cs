@@ -15,7 +15,7 @@ public class EventHandling
     /// <summary>
     /// The event.
     /// </summary>
-    public IIntegrationEvent IntegrationEvent { get; set; } = null!;
+    public IntegrationEvent IntegrationEvent { get; set; } = null!;
 
     /// <summary>
     /// Time at which the event was handled.
@@ -33,7 +33,7 @@ public class EventHandling
 /// </summary>
 /// <typeparam name="TIntegrationEvent">Integration event type.</typeparam>
 public class EventHandling<TIntegrationEvent>
-    where TIntegrationEvent : IIntegrationEvent
+    where TIntegrationEvent : IntegrationEvent
 
 {
     /// <summary>

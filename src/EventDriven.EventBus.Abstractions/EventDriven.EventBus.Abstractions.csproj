@@ -8,7 +8,6 @@
     <Description>An event bus abstraction layer.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>eda-logo.jpeg</PackageIcon>
-    <Company>Dapr .NET Extensions</Company>
     <Authors>Tony Sneed</Authors>
     <PackageProjectUrl>https://github.com/event-driven-dotnet/EventDriven.EventBus.Abstractions</PackageProjectUrl>
     <RepositoryUrl>https://github.com/event-driven-dotnet/EventDriven.EventBus.Abstractions.git</RepositoryUrl>

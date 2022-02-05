@@ -47,6 +47,6 @@ namespace EventDriven.EventBus.Abstractions
             TIntegrationEvent @event,
             string? topic = null,
             string? prefix = null)
-            where TIntegrationEvent : IIntegrationEvent;
+            where TIntegrationEvent : IntegrationEvent;
     }
 }

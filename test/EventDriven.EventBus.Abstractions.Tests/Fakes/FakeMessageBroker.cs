@@ -27,7 +27,7 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
         public virtual Task PublishEventAsync<TIntegrationEvent>(
             TIntegrationEvent @event,
             string topic)
-            where TIntegrationEvent : IIntegrationEvent
+            where TIntegrationEvent : IntegrationEvent
         {
             var handlers = Topics[topic];
             foreach (var handler in handlers)

@@ -10,7 +10,7 @@ public class FakeInMemoryEventCache : InMemoryEventCache
 
     public int GetCacheCount() => Cache.Count;
 
-    public override bool TryAdd(IIntegrationEvent @event)
+    public override bool TryAdd(IntegrationEvent @event)
     {
         // Return true if not enabled
         if (!EventCacheOptions.EnableEventCache) return true;

@@ -49,7 +49,7 @@ namespace EventDriven.EventBus.Abstractions
             TIntegrationEvent @event,
             string? topic = null,
             string? prefix = null)
-            where TIntegrationEvent : IIntegrationEvent;
+            where TIntegrationEvent : IntegrationEvent;
 
         /// <summary>
         /// Get topic name from event handler.

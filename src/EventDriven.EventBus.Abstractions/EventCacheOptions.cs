@@ -18,9 +18,9 @@ public class EventCacheOptions
     public TimeSpan EventCacheTimeout { get; set; } = TimeSpan.FromSeconds(60);
 
     /// <summary>
-    /// True to enable event cache clean up. Defaults to true.
+    /// True to enable event cache clean up. Defaults to false.
     /// </summary>
-    public bool EnableEventCacheCleanup { get; set; } = true;
+    public bool EnableEventCacheCleanup { get; set; }
 
     /// <summary>
     /// Event cache cleanup interval. Defaults to 5 minutes.
