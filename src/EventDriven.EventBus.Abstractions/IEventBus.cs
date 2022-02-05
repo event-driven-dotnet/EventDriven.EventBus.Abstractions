@@ -21,8 +21,8 @@ namespace EventDriven.EventBus.Abstractions
         /// <param name="prefix">Dot delimited prefix, which can include version.</param>
         void Subscribe(
             IIntegrationEventHandler handler,
-            string topic = null,
-            string prefix = null);
+            string? topic = null,
+            string? prefix = null);
 
         /// <summary>
         /// Unregister a subscription with an event handler.
@@ -32,8 +32,8 @@ namespace EventDriven.EventBus.Abstractions
         /// <param name="prefix">Dot delimited prefix, which can include version.</param>
         void UnSubscribe(
             IIntegrationEventHandler handler,
-            string topic = null,
-            string prefix = null);
+            string? topic = null,
+            string? prefix = null);
 
         /// <summary>
         /// Publish an event asynchronously.
@@ -45,8 +45,8 @@ namespace EventDriven.EventBus.Abstractions
         /// <returns>Task that will complete when the operation has completed.</returns>
         Task PublishAsync<TIntegrationEvent>(
             TIntegrationEvent @event,
-            string topic = null,
-            string prefix = null)
+            string? topic = null,
+            string? prefix = null)
             where TIntegrationEvent : IIntegrationEvent;
     }
 }

@@ -3,9 +3,9 @@ using System;
 namespace EventDriven.EventBus.Abstractions;
 
 /// <summary>
-/// EventBus options.
+/// Event cache options.
 /// </summary>
-public class EventBusOptions
+public class EventCacheOptions
 {
     /// <summary>
     /// True to enable event cache for idempotency. Defaults to true.

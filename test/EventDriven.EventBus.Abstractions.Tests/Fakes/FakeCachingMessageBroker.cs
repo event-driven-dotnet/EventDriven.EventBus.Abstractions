@@ -6,7 +6,7 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
     {
         public IEventCache EventCache { get; }
 
-        public IEventBus EventBus { get; set; }
+        public IEventBus? EventBus { get; set; }
 
         public FakeCachingMessageBroker(
             IEventCache eventCache)
@@ -19,7 +19,6 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
             string topic)
         {
             var handlers = Topics[topic];
-            if (handlers == null) return Task.CompletedTask;
             foreach (var handler in handlers)
             {
                 if (EventCache.TryAdd(@event))

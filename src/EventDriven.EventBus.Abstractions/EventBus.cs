@@ -13,8 +13,8 @@ namespace EventDriven.EventBus.Abstractions
         ///<inheritdoc/>
         public virtual void Subscribe(
             IIntegrationEventHandler handler,
-            string topic = null,
-            string prefix = null)
+            string? topic = null,
+            string? prefix = null)
         {
             var topicName = GetTopicName(handler, topic, prefix);
             if (Topics.TryGetValue(topicName, out var handlers))
@@ -30,8 +30,8 @@ namespace EventDriven.EventBus.Abstractions
         ///<inheritdoc/>
         public virtual void UnSubscribe(
             IIntegrationEventHandler handler,
-            string topic = null,
-            string prefix = null)
+            string? topic = null,
+            string? prefix = null)
         {
             var topicName = GetTopicName(handler, topic, prefix);
             if (Topics.TryGetValue(topicName, out var handlers))
@@ -47,8 +47,8 @@ namespace EventDriven.EventBus.Abstractions
         ///<inheritdoc/>
         public abstract Task PublishAsync<TIntegrationEvent>(
             TIntegrationEvent @event,
-            string topic = null,
-            string prefix = null)
+            string? topic = null,
+            string? prefix = null)
             where TIntegrationEvent : IIntegrationEvent;
 
         /// <summary>
@@ -60,8 +60,8 @@ namespace EventDriven.EventBus.Abstractions
         /// <returns>Fully qualified topic name.</returns>
         protected string GetTopicName(
             IIntegrationEventHandler handler,
-            string topic,
-            string prefix) => FormatTopicName(handler.Topic, topic, prefix);
+            string? topic,
+            string? prefix) => FormatTopicName(handler.Topic, topic, prefix);
 
         /// <summary>
         /// Get topic name from event handler.
@@ -72,13 +72,13 @@ namespace EventDriven.EventBus.Abstractions
         /// <returns>Fully qualified topic name.</returns>
         protected string GetTopicName(
             Type eventType,
-            string topic,
-            string prefix) => FormatTopicName(eventType.Name, topic, prefix);
+            string? topic,
+            string? prefix) => FormatTopicName(eventType.Name, topic, prefix);
 
         private string FormatTopicName(
             string implicitTopic,
-            string explicitTopic,
-            string prefix)
+            string? explicitTopic,
+            string? prefix)
         {
             var topicName = string.IsNullOrWhiteSpace(explicitTopic) ? implicitTopic : explicitTopic;
             topicName = string.IsNullOrWhiteSpace(prefix) ? topicName : $"{prefix}.{topicName}";

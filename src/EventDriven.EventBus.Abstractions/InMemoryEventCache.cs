@@ -22,7 +22,7 @@ public class InMemoryEventCache : IEventCache
     /// <summary>
     /// Cleanup timer.
     /// </summary>
-    protected Timer CleanupTimer { get; }
+    protected Timer? CleanupTimer { get; }
 
     /// <summary>
     /// Lock timeout.
@@ -30,7 +30,7 @@ public class InMemoryEventCache : IEventCache
     protected TimeSpan LockTimeout { get; set; } = TimeSpan.FromSeconds(60);
     
     /// <inheritdoc />
-    public EventBusOptions EventBusOptions { get; set; }
+    public EventCacheOptions EventCacheOptions { get; set; }
 
     /// <summary>
     /// Cancellation token.
@@ -43,14 +43,14 @@ public class InMemoryEventCache : IEventCache
     /// <param name="eventBusOptions">Event bus options.</param>
     /// <param name="cancellationToken">Cancellation token</param>
     public InMemoryEventCache(
-        EventBusOptions eventBusOptions,
+        EventCacheOptions eventBusOptions,
         CancellationToken cancellationToken = default)
     {
-        EventBusOptions = eventBusOptions;
+        EventCacheOptions = eventBusOptions;
         CancellationToken = cancellationToken;
-        async void TimerCallback(object state) => await CleanupEventCacheAsync();
-        if (EventBusOptions.EnableEventCacheCleanup)
-            CleanupTimer = new Timer(TimerCallback, null, TimeSpan.Zero, EventBusOptions.EventCacheCleanupInterval);
+        async void TimerCallback(object? state) => await CleanupEventCacheAsync();
+        if (EventCacheOptions.EnableEventCacheCleanup)
+            CleanupTimer = new Timer(TimerCallback, null, TimeSpan.Zero, EventCacheOptions.EventCacheCleanupInterval);
     }
 
     /// <summary>
@@ -62,9 +62,9 @@ public class InMemoryEventCache : IEventCache
         using (new TimedLock(_syncRoot).Lock(LockTimeout))
         {
             // End timer and exit if cache cleanup disabled or cancellation pending
-            if (!EventBusOptions.EnableEventCacheCleanup || CancellationToken.IsCancellationRequested)
+            if (!EventCacheOptions.EnableEventCacheCleanup || CancellationToken.IsCancellationRequested)
             {
-                await CleanupTimer.DisposeAsync();
+                if (CleanupTimer != null) await CleanupTimer.DisposeAsync();
                 return;
             }
 
@@ -81,7 +81,7 @@ public class InMemoryEventCache : IEventCache
     public virtual bool TryAdd(IIntegrationEvent @event)
     {
         // Return true if not enabled
-        if (!EventBusOptions.EnableEventCache) return true;
+        if (!EventCacheOptions.EnableEventCache) return true;
         
         // Return false if event exists and is not expired
         bool expired = false;
@@ -100,7 +100,7 @@ public class InMemoryEventCache : IEventCache
             EventId = @event.Id,
             IntegrationEvent = @event,
             EventHandledTime = DateTime.UtcNow,
-            EventHandledTimeout = EventBusOptions.EventCacheTimeout
+            EventHandledTimeout = EventCacheOptions.EventCacheTimeout
         };
         return Cache.TryAdd(@event.Id, handling);
     }

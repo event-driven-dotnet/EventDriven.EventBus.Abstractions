@@ -9,8 +9,8 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
 
         public virtual void Subscribe(
             IIntegrationEventHandler handler,
-            string topic = null,
-            string prefix = null)
+            string? topic = null,
+            string? prefix = null)
         {
             var topicName = string.IsNullOrWhiteSpace(topic) ? handler.Topic : topic;
             topicName = string.IsNullOrWhiteSpace(prefix) ? topicName : $"{prefix}.{topicName}";
@@ -30,12 +30,9 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
             where TIntegrationEvent : IIntegrationEvent
         {
             var handlers = Topics[topic];
-            if (handlers != null)
+            foreach (var handler in handlers)
             {
-                foreach (var handler in handlers)
-                {
-                    handler.HandleAsync(@event);
-                }
+                handler.HandleAsync(@event);
             }
             return Task.CompletedTask;
         }

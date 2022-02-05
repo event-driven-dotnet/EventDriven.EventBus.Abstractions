@@ -94,7 +94,7 @@ namespace EventDriven.EventBus.Abstractions.Tests
 
             // Create message broker
             const string prefix = "v1";
-            var options = new EventBusOptions
+            var options = new EventCacheOptions
             {
                 EnableEventCache = enableCache,
                 EventCacheTimeout = expire ? TimeSpan.FromMilliseconds(200) : TimeSpan.FromSeconds(60),
@@ -131,7 +131,7 @@ namespace EventDriven.EventBus.Abstractions.Tests
 
             // Create message broker
             const string prefix = "v1";
-            var options = new EventBusOptions
+            var options = new EventCacheOptions
             {
                 EnableEventCache = true,
                 EventCacheTimeout = TimeSpan.FromMilliseconds(20),

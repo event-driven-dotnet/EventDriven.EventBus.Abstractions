@@ -8,7 +8,7 @@ public interface IEventCache
     /// <summary>
     /// Event bus options.
     /// </summary>
-    EventBusOptions EventBusOptions { get; set; }
+    EventCacheOptions EventCacheOptions { get; set; }
 
     /// <summary>
     /// Attempts to add the integration event to the event cache.
