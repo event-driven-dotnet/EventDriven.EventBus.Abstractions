@@ -6,23 +6,8 @@ namespace EventDriven.EventBus.Abstractions;
 /// <summary>
 /// Event handing repository interface.
 /// </summary>
-public interface IEventHandlingRepository
-{
-    /// <summary>
-    /// Remove expired events.
-    /// </summary>
-    /// <returns>
-    /// Task that will complete when the operation has completed.
-    /// Task contains number of items deleted.
-    /// </returns>
-    Task<int> RemoveExpiredEventsAsync();
-}
-
-/// <summary>
-/// Event handing repository interface.
-/// </summary>
 /// <typeparam name="TIntegrationEvent">Integration event type.</typeparam>
-public interface IEventHandlingRepository<TIntegrationEvent> : IEventHandlingRepository
+public interface IEventHandlingRepository<TIntegrationEvent>
     where TIntegrationEvent : IntegrationEvent
 {
     /// <summary>
