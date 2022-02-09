@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using EventDriven.Utilities;
+using NeoSmart.AsyncLock;
 
 namespace EventDriven.EventBus.Abstractions;
 
@@ -12,7 +12,7 @@ namespace EventDriven.EventBus.Abstractions;
 /// </summary>
 public class InMemoryEventCache : IEventCache
 {
-    private readonly object _syncRoot = new object();
+    private readonly AsyncLock _syncRoot = new();
     
     /// <summary>
     /// Thread-safe event cache.
@@ -24,11 +24,6 @@ public class InMemoryEventCache : IEventCache
     /// </summary>
     protected Timer? CleanupTimer { get; }
 
-    /// <summary>
-    /// Lock timeout.
-    /// </summary>
-    protected TimeSpan LockTimeout { get; set; } = TimeSpan.FromSeconds(60);
-    
     /// <inheritdoc />
     public EventCacheOptions EventCacheOptions { get; set; }
 
@@ -59,7 +54,7 @@ public class InMemoryEventCache : IEventCache
     /// <returns>Task that will complete when the operation has completed.</returns>
     protected virtual async Task CleanupEventCacheAsync()
     {
-        using (new TimedLock(_syncRoot).Lock(LockTimeout))
+        using (await _syncRoot.LockAsync(CancellationToken))
         {
             // End timer and exit if cache cleanup disabled or cancellation pending
             if (!EventCacheOptions.EnableEventCacheCleanup || CancellationToken.IsCancellationRequested)
