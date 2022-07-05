@@ -9,11 +9,13 @@ namespace EventDriven.EventBus.Abstractions.Tests
     public class EventBusTests
     {
         [Theory]
-        [InlineData(TopicType.Implicit, null)]
-        [InlineData(TopicType.Implicit, "v1")]
-        [InlineData(TopicType.Explicit, null)]
-        [InlineData(TopicType.Explicit, "v1")]
-        public async Task EventBus_Should_Invoke_Event_Handlers(TopicType topicType, string prefix)
+        [InlineData(TopicType.Implicit, null, null)]
+        [InlineData(TopicType.Implicit, "v1", null)]
+        [InlineData(TopicType.Explicit, null, null)]
+        [InlineData(TopicType.Explicit, "v1", null)]
+        [InlineData(TopicType.Explicit, null, "suffix")]
+        [InlineData(TopicType.Explicit, "v1", "suffix")]
+        public async Task EventBus_Should_Invoke_Event_Handlers(TopicType topicType, string prefix, string suffix)
         {
             // Topic name
             var topicName = topicType == TopicType.Explicit ? "my-topic" : null;
@@ -25,17 +27,17 @@ namespace EventDriven.EventBus.Abstractions.Tests
 
             // Create message broker
             var messageBroker = new FakeMessageBroker();
-            messageBroker.Subscribe(fakeHandler1, topicName, prefix);
-            messageBroker.Subscribe(fakeHandler2, topicName, prefix);
+            messageBroker.Subscribe(fakeHandler1, topicName, prefix, suffix);
+            messageBroker.Subscribe(fakeHandler2, topicName, prefix, suffix);
 
             // Create event bus
             var eventBus = new FakeEventBus(messageBroker);
-            eventBus.Subscribe(fakeHandler1, topicName, prefix);
-            eventBus.Subscribe(fakeHandler2, topicName, prefix);
+            eventBus.Subscribe(fakeHandler1, topicName, prefix, suffix);
+            eventBus.Subscribe(fakeHandler2, topicName, prefix, suffix);
 
             // Publish to service bus
             var @event = new FakeIntegrationEvent("B");
-            await eventBus.PublishAsync(@event, topicName, prefix);
+            await eventBus.PublishAsync(@event, topicName, prefix, suffix);
 
             // Assert
             Assert.Equal(@event.CreationDate, state.Date);

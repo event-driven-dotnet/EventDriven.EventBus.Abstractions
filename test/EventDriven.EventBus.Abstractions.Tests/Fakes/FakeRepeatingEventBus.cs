@@ -20,9 +20,10 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
         public override async Task PublishAsync<TIntegrationEvent>(
             TIntegrationEvent @event,
             string? topic = null,
-            string? prefix = null)
+            string? prefix = null,
+            string? suffix = null)
         {
-            var topicName = GetTopicName(@event.GetType(), topic, prefix);
+            var topicName = GetTopicName(@event.GetType(), topic, prefix, suffix);
             for (int i = 0; i < _iterations; i++)
             {
                 await MessageBroker.PublishEventAsync(@event, topicName);

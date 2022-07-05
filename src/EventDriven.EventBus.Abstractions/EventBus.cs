@@ -14,9 +14,10 @@ namespace EventDriven.EventBus.Abstractions
         public virtual void Subscribe(
             IIntegrationEventHandler handler,
             string? topic = null,
-            string? prefix = null)
+            string? prefix = null,
+            string? suffix = null)
         {
-            var topicName = GetTopicName(handler, topic, prefix);
+            var topicName = GetTopicName(handler, topic, prefix, suffix);
             if (Topics.TryGetValue(topicName, out var handlers))
             {
                 handlers.Add(handler);
@@ -31,9 +32,10 @@ namespace EventDriven.EventBus.Abstractions
         public virtual void UnSubscribe(
             IIntegrationEventHandler handler,
             string? topic = null,
-            string? prefix = null)
+            string? prefix = null,
+            string? suffix = null)
         {
-            var topicName = GetTopicName(handler, topic, prefix);
+            var topicName = GetTopicName(handler, topic, prefix, suffix);
             if (Topics.TryGetValue(topicName, out var handlers))
             {
                 handlers.Remove(handler);
@@ -48,7 +50,8 @@ namespace EventDriven.EventBus.Abstractions
         public abstract Task PublishAsync<TIntegrationEvent>(
             TIntegrationEvent @event,
             string? topic = null,
-            string? prefix = null)
+            string? prefix = null,
+            string? suffix = null)
             where TIntegrationEvent : IntegrationEvent;
 
         /// <summary>
@@ -57,11 +60,13 @@ namespace EventDriven.EventBus.Abstractions
         /// <param name="handler">Subscription event handler.</param>
         /// <param name="topic">Subscription topic.</param>
         /// <param name="prefix">Dot delimited prefix, which can include version.</param>
+        /// <param name="suffix">Dot delimited suffix, which can include version.</param>
         /// <returns>Fully qualified topic name.</returns>
         protected string GetTopicName(
             IIntegrationEventHandler handler,
             string? topic,
-            string? prefix) => FormatTopicName(handler.Topic, topic, prefix);
+            string? prefix,
+            string? suffix) => FormatTopicName(handler.Topic, topic, prefix, suffix);
 
         /// <summary>
         /// Get topic name from event handler.
@@ -69,19 +74,23 @@ namespace EventDriven.EventBus.Abstractions
         /// <param name="eventType">Integration event type.</param>
         /// <param name="topic">Subscription topic.</param>
         /// <param name="prefix">Dot delimited prefix, which can include version.</param>
+        /// <param name="suffix">Dot delimited suffix, which can include version.</param>
         /// <returns>Fully qualified topic name.</returns>
         protected string GetTopicName(
             Type eventType,
             string? topic,
-            string? prefix) => FormatTopicName(eventType.Name, topic, prefix);
+            string? prefix,
+            string? suffix) => FormatTopicName(eventType.Name, topic, prefix, suffix);
 
         private string FormatTopicName(
             string implicitTopic,
             string? explicitTopic,
-            string? prefix)
+            string? prefix,
+            string? suffix)
         {
             var topicName = string.IsNullOrWhiteSpace(explicitTopic) ? implicitTopic : explicitTopic;
             topicName = string.IsNullOrWhiteSpace(prefix) ? topicName : $"{prefix}.{topicName}";
+            topicName = string.IsNullOrWhiteSpace(suffix) ? topicName : $"{topicName}.{suffix}";
             return topicName;
         }
     }
