@@ -15,6 +15,11 @@ public class InMemoryEventCache : IEventCache
     private readonly AsyncLock _syncRoot = new();
     
     /// <summary>
+    /// Event cache options.
+    /// </summary>
+    protected readonly EventCacheOptions EventCacheOptions;
+
+    /// <summary>
     /// Thread-safe event cache.
     /// </summary>
     protected ConcurrentDictionary<string, EventHandling> Cache { get; } = new();
@@ -24,9 +29,6 @@ public class InMemoryEventCache : IEventCache
     /// </summary>
     protected Timer? CleanupTimer { get; }
 
-    /// <inheritdoc />
-    public EventCacheOptions EventCacheOptions { get; set; }
-
     /// <summary>
     /// Cancellation token.
     /// </summary>
@@ -35,13 +37,13 @@ public class InMemoryEventCache : IEventCache
     /// <summary>
     /// Constructor.
     /// </summary>
-    /// <param name="eventBusOptions">Event bus options.</param>
+    /// <param name="eventCacheOptions">Event cache options.</param>
     /// <param name="cancellationToken">Cancellation token</param>
     public InMemoryEventCache(
-        EventCacheOptions eventBusOptions,
+        EventCacheOptions eventCacheOptions,
         CancellationToken cancellationToken = default)
     {
-        EventCacheOptions = eventBusOptions;
+        EventCacheOptions = eventCacheOptions;
         CancellationToken = cancellationToken;
         async void TimerCallback(object? state) => await CleanupEventCacheAsync();
         if (EventCacheOptions.EnableEventCacheCleanup)
@@ -99,4 +101,8 @@ public class InMemoryEventCache : IEventCache
         };
         return Cache.TryAdd(@event.Id, handling);
     }
+
+    /// <inheritdoc />
+    public Task<bool> TryAddAsync(IntegrationEvent? @event) =>
+        Task.FromResult(TryAdd(@event!));
 }

@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace EventDriven.EventBus.Abstractions;
 
 /// <summary>
@@ -5,11 +7,6 @@ namespace EventDriven.EventBus.Abstractions;
 /// </summary>
 public interface IEventCache
 {
-    /// <summary>
-    /// Event bus options.
-    /// </summary>
-    EventCacheOptions EventCacheOptions { get; set; }
-
     /// <summary>
     /// Attempts to add the integration event to the event cache.
     /// </summary>
@@ -19,4 +16,15 @@ public interface IEventCache
     /// False if the event is in the cache and not expired or it cannot be removed. 
     /// </returns>
     bool TryAdd(IntegrationEvent @event);
+    
+    /// <summary>
+    /// Attempts to add the integration event to the event cache.
+    /// </summary>
+    /// <param name="event">The integration event</param>
+    /// <returns>
+    /// Task that will complete when the operation has completed.
+    /// Task contains true if the event was added to the event cache,
+    /// false if the event is in the cache and not expired or it cannot be removed.
+    /// </returns>
+    Task<bool> TryAddAsync(IntegrationEvent @event);
 }

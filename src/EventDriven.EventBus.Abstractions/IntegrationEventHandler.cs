@@ -32,6 +32,7 @@ namespace EventDriven.EventBus.Abstractions
         public abstract Task HandleAsync(TIntegrationEvent @event);
 
         ///<inheritdoc/>
-        public virtual Task HandleAsync(IIntegrationEvent @event) => HandleAsync((TIntegrationEvent)@event);
+        public virtual Task HandleAsync(IIntegrationEvent? @event) => 
+            HandleAsync((TIntegrationEvent)@event!);
     }
 }
