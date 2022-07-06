@@ -19,10 +19,12 @@ namespace EventDriven.EventBus.Abstractions
         /// <param name="handler">Subscription event handler.</param>
         /// <param name="topic">Subscription topic.</param>
         /// <param name="prefix">Dot delimited prefix, which can include version.</param>
+        /// <param name="suffix">Dot delimited suffix, which can include version.</param>
         void Subscribe(
             IIntegrationEventHandler handler,
             string? topic = null,
-            string? prefix = null);
+            string? prefix = null,
+            string? suffix = null);
 
         /// <summary>
         /// Unregister a subscription with an event handler.
@@ -30,10 +32,12 @@ namespace EventDriven.EventBus.Abstractions
         /// <param name="handler">Subscription event handler.</param>
         /// <param name="topic">Subscription topic.</param>
         /// <param name="prefix">Dot delimited prefix, which can include version.</param>
+        /// <param name="suffix">Dot delimited suffix, which can include version.</param>
         void UnSubscribe(
             IIntegrationEventHandler handler,
             string? topic = null,
-            string? prefix = null);
+            string? prefix = null,
+            string? suffix = null);
 
         /// <summary>
         /// Publish an event asynchronously.
@@ -42,11 +46,13 @@ namespace EventDriven.EventBus.Abstractions
         /// <param name="event">Integration event.</param>
         /// <param name="topic">Publication topic.</param>
         /// <param name="prefix">Dot delimited prefix, which can include version.</param>
+        /// <param name="suffix">Dot delimited suffix, which can include version.</param>
         /// <returns>Task that will complete when the operation has completed.</returns>
         Task PublishAsync<TIntegrationEvent>(
             TIntegrationEvent @event,
             string? topic = null,
-            string? prefix = null)
+            string? prefix = null,
+            string? suffix = null)
             where TIntegrationEvent : IntegrationEvent;
     }
 }

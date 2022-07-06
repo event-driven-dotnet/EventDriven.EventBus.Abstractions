@@ -10,10 +10,12 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
         public virtual void Subscribe(
             IIntegrationEventHandler handler,
             string? topic = null,
-            string? prefix = null)
+            string? prefix = null,
+            string? suffix = null)
         {
             var topicName = string.IsNullOrWhiteSpace(topic) ? handler.Topic : topic;
             topicName = string.IsNullOrWhiteSpace(prefix) ? topicName : $"{prefix}.{topicName}";
+            topicName = string.IsNullOrWhiteSpace(suffix) ? topicName : $"{topicName}.{suffix}";
             if (Topics.TryGetValue(topicName, out var handlers))
             {
                 handlers.Add(handler);
