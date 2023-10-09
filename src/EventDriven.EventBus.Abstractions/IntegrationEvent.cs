@@ -3,7 +3,7 @@
 namespace EventDriven.EventBus.Abstractions
 {
     /// <inheritdoc cref="IIntegrationEvent" />
-    public abstract record IntegrationEvent : IIntegrationEvent
+    public record IntegrationEvent : IIntegrationEvent
     {
         ///<inheritdoc/>
         public string Id { get; set; } = Guid.NewGuid().ToString();
