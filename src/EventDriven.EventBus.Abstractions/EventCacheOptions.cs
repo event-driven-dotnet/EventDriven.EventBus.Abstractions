@@ -26,4 +26,9 @@ public class EventCacheOptions
     /// Event cache cleanup interval. Defaults to 5 minutes.
     /// </summary>
     public TimeSpan EventCacheCleanupInterval { get; set; } = TimeSpan.FromMinutes(5);
+    
+    /// <summary>
+    /// Event errors cache cleanup interval. Defaults to 15 minutes.
+    /// </summary>
+    public TimeSpan EventErrorsCacheCleanupInterval { get; set; } = TimeSpan.FromMinutes(15);
 }

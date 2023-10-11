@@ -49,12 +49,13 @@ public interface IEventHandlingRepository<TIntegrationEvent>
     /// Get expired integration events.
     /// </summary>
     /// <param name="appName">Optional app name.</param>
+    /// <param name="excludeErrors">True to exclude events with errors. Defaults to true.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken" /> that can be used to cancel the operation.</param>
     /// <returns>
     /// A <see cref="Task" /> that will complete when the operation has completed.
     /// Task contains an IEnumerable of EventWrapper of TIntegrationEvent.
     /// </returns>
     Task<IEnumerable<EventWrapper<TIntegrationEvent>>> GetExpiredEventsAsync(
-        string? appName = null,
+        string? appName = null, bool excludeErrors = true,
         CancellationToken cancellationToken = default);
 }

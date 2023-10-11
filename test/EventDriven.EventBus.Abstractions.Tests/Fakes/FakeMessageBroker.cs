@@ -17,25 +17,18 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
             topicName = string.IsNullOrWhiteSpace(prefix) ? topicName : $"{prefix}.{topicName}";
             topicName = string.IsNullOrWhiteSpace(suffix) ? topicName : $"{topicName}.{suffix}";
             if (Topics.TryGetValue(topicName, out var handlers))
-            {
                 handlers.Add(handler);
-            }
             else
-            {
                 Topics.Add(topicName, new List<IIntegrationEventHandler> { handler });
-            }
         }
 
         public virtual Task PublishEventAsync<TIntegrationEvent>(
             TIntegrationEvent @event,
-            string topic)
+            string topic, bool hasError = false)
             where TIntegrationEvent : IntegrationEvent
         {
             var handlers = Topics[topic];
-            foreach (var handler in handlers)
-            {
-                handler.HandleAsync(@event);
-            }
+            foreach (var handler in handlers) handler.HandleAsync(@event);
             return Task.CompletedTask;
         }
     }

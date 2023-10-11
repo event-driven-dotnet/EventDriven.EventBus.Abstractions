@@ -14,17 +14,19 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
             EventCache = eventCache;
         }
         
-        public override Task PublishEventAsync<TIntegrationEvent>(
+        public override async Task PublishEventAsync<TIntegrationEvent>(
             TIntegrationEvent @event,
-            string topic)
+            string topic, bool hasError = false)
         {
             var handlers = Topics[topic];
             foreach (var handler in handlers)
             {
-                if (EventCache.TryAdd(@event))
-                    handler.HandleAsync(@event);
+                var handlerTypeName = handler.GetType().Name;
+                var errorMessage = hasError ? "Fake Error" : null;
+                if (await EventCache.HasBeenHandledAsync(@event, handlerTypeName)) continue;
+                if (!hasError) await handler.HandleAsync(@event);
+                await EventCache.AddEventAsync(@event, handlerTypeName, errorMessage);
             }
-            return Task.CompletedTask;
         }
     }
 }

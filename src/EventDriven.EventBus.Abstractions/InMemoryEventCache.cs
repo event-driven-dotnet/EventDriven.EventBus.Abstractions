@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,12 +22,17 @@ public class InMemoryEventCache : IEventCache
     /// <summary>
     /// Thread-safe event cache.
     /// </summary>
-    protected ConcurrentDictionary<string, EventHandling> Cache { get; } = new();
+    protected Dictionary<string, EventHandling> Cache { get; } = new();
 
     /// <summary>
     /// Cleanup timer.
     /// </summary>
     protected Timer? CleanupTimer { get; }
+
+    /// <summary>
+    /// Errors cleanup timer.
+    /// </summary>
+    protected Timer? ErrorsCleanupTimer { get; }
 
     /// <summary>
     /// Cancellation token.
@@ -45,13 +50,18 @@ public class InMemoryEventCache : IEventCache
     {
         EventCacheOptions = eventCacheOptions;
         CancellationToken = cancellationToken;
-        async void TimerCallback(object? state) => await CleanupEventCacheAsync();
         if (EventCacheOptions.EnableEventCacheCleanup)
+        {
             CleanupTimer = new Timer(TimerCallback, null, TimeSpan.Zero, EventCacheOptions.EventCacheCleanupInterval);
+            ErrorsCleanupTimer = new Timer(ErrorsTimerCallback, null, TimeSpan.Zero, EventCacheOptions.EventErrorsCacheCleanupInterval);
+        }
+        return;
+        async void TimerCallback(object? state) => await CleanupEventCacheAsync();
+        async void ErrorsTimerCallback(object? state) => await CleanupEventCacheErrorsAsync();
     }
 
     /// <summary>
-    /// Cleans up event cache.
+    /// Clean up event cache.
     /// </summary>
     /// <returns>Task that will complete when the operation has completed.</returns>
     protected virtual async Task CleanupEventCacheAsync()
@@ -65,33 +75,69 @@ public class InMemoryEventCache : IEventCache
                 return;
             }
 
-            // Remove expired events
+            // Remove expired events without errors
             var expired = Cache
                 .Where(kvp =>
-                    kvp.Value.EventHandledTimeout < DateTime.UtcNow - kvp.Value.EventHandledTime);
+                    DateTime.UtcNow > kvp.Value.EventHandledTime + kvp.Value.EventHandledTimeout
+                    && !kvp.Value.Handlers.Any(h => h.Value.HasError));
             foreach (var keyValuePair in expired)
-                Cache.TryRemove(keyValuePair);
+                Cache.Remove(keyValuePair.Key);
+        }
+    }
+
+    /// <summary>
+    /// Clean up event cache errors.
+    /// </summary>
+    /// <returns>Task that will complete when the operation has completed.</returns>
+    protected virtual async Task CleanupEventCacheErrorsAsync()
+    {
+        using (await _syncRoot.LockAsync(CancellationToken))
+        {
+            // End timer and exit if cache cleanup disabled or cancellation pending
+            if (!EventCacheOptions.EnableEventCacheCleanup || CancellationToken.IsCancellationRequested)
+            {
+                if (ErrorsCleanupTimer != null) await ErrorsCleanupTimer.DisposeAsync();
+                return;
+            }
+
+            // Remove expired events with errors
+            var expiredWithErrors = Cache
+                .Where(kvp =>
+                    DateTime.UtcNow > kvp.Value.EventHandledTime + kvp.Value.EventHandledTimeout
+                    && kvp.Value.Handlers.Any(h => h.Value.HasError));
+            foreach (var keyValuePair in expiredWithErrors)
+                Cache.Remove(keyValuePair.Key);
         }
     }
 
     /// <inheritdoc />
-    public virtual bool TryAdd(IntegrationEvent @event)
+    public Task<bool> HasBeenHandledAsync(IntegrationEvent @event, string handlerTypeName)
     {
-        // Return true if not enabled
-        if (!EventCacheOptions.EnableEventCache) return true;
+        // Return false if not enabled
+        if (!EventCacheOptions.EnableEventCache) return Task.FromResult(false);
         
-        // Return false if event exists and is not expired
-        bool expired = false;
-        if (Cache.TryGetValue(@event.Id, out var existing))
-            expired = existing.EventHandledTimeout < DateTime.UtcNow - existing.EventHandledTime;
-        if (existing != null && !expired) return false;
+        // Return true if event exists, is not expired, and handler has no error
+        var exists = Cache.TryGetValue(@event.Id, out var handling);
+        var expired = handling != null &&
+                      DateTime.UtcNow > handling.EventHandledTime + handling.EventHandledTimeout;
+        var hasError = handling != null &&
+                       handling.Handlers.ContainsKey(handlerTypeName) &&
+                       handling.Handlers[handlerTypeName].HasError;
+        var hasBeenHandled = exists && !(expired || hasError);
+        return Task.FromResult(hasBeenHandled);
+    }
+
+    /// <inheritdoc />
+    public Task AddEventAsync(IntegrationEvent @event,
+        string? handlerTypeName = null, string? errorMessage = null)
+    {
+        // Return if cache not enabled
+        if (!EventCacheOptions.EnableEventCache) return Task.CompletedTask;
         
-        // Remove existing; return false if unable to remove
-        if (existing != null
-            && !Cache.TryRemove(@event.Id, out existing))
-            return false;
-            
-        // Add event handling
+        // Remove existing event
+        Cache.Remove(@event.Id);
+        
+        // Add new event
         var handling = new EventHandling
         {
             EventId = @event.Id,
@@ -99,10 +145,16 @@ public class InMemoryEventCache : IEventCache
             EventHandledTime = DateTime.UtcNow,
             EventHandledTimeout = EventCacheOptions.EventCacheTimeout
         };
-        return Cache.TryAdd(@event.Id, handling);
+        if (!string.IsNullOrWhiteSpace(handlerTypeName))
+        {
+            handling.Handlers.Add(handlerTypeName, new HandlerInfo
+            {
+                HasError = !string.IsNullOrWhiteSpace(errorMessage),
+                ErrorMessage = !string.IsNullOrWhiteSpace(errorMessage)
+                    ? errorMessage : null
+            });
+        }
+        Cache.Add(@event.Id, handling);
+        return Task.CompletedTask;
     }
-
-    /// <inheritdoc />
-    public Task<bool> TryAddAsync(IntegrationEvent? @event) =>
-        Task.FromResult(TryAdd(@event!));
 }
