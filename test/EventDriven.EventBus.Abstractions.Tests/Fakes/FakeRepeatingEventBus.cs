@@ -9,8 +9,8 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
         private readonly bool _expire;
 
         public FakeRepeatingEventBus(FakeMessageBroker messageBroker,
-            EventCacheOptions eventBusOptions, int iterations, bool expire) :
-            base(messageBroker)
+            EventCacheOptions eventBusOptions, int iterations, bool expire, bool hasError) :
+            base(messageBroker, hasError)
         {
             _eventBusOptions = eventBusOptions;
             _iterations = iterations;
@@ -26,7 +26,7 @@ namespace EventDriven.EventBus.Abstractions.Tests.Fakes
             var topicName = GetTopicName(@event.GetType(), topic, prefix, suffix);
             for (int i = 0; i < _iterations; i++)
             {
-                await MessageBroker.PublishEventAsync(@event, topicName);
+                await MessageBroker.PublishEventAsync(@event, topicName, HasError);
                 if (_expire) await Task.Delay(_eventBusOptions.EventCacheTimeout * 1.5);
             }
         }

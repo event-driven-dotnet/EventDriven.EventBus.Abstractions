@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace EventDriven.EventBus.Abstractions;
 
@@ -26,6 +27,11 @@ public class EventHandling
     /// Timespan during which event is considered to be handled.
     /// </summary>
     public TimeSpan EventHandledTimeout { get; set; }
+
+    /// <summary>
+    /// Handlers for the event.
+    /// </summary>
+    public Dictionary<string, HandlerInfo> Handlers { get; set; } = new();
 }
 
 /// <summary>
@@ -55,4 +61,9 @@ public class EventHandling<TIntegrationEvent>
     /// Timespan during which event is considered to be handled.
     /// </summary>
     public TimeSpan EventHandledTimeout { get; set; }
+    
+    /// <summary>
+    /// Handlers for the event.
+    /// </summary>
+    public Dictionary<string, HandlerInfo> Handlers { get; set; } = new();
 }
