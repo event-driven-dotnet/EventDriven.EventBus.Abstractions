@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using NeoSmart.AsyncLock;
+using AsyncKeyedLock;
 
 namespace EventDriven.EventBus.Abstractions;
 
@@ -12,7 +12,7 @@ namespace EventDriven.EventBus.Abstractions;
 /// </summary>
 public class InMemoryEventCache : IEventCache
 {
-    private readonly AsyncLock _syncRoot = new();
+    private readonly AsyncNonKeyedLocker _syncRoot = new();
     
     /// <summary>
     /// Event cache options.
