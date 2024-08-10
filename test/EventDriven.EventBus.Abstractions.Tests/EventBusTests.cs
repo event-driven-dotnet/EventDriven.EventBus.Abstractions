@@ -15,7 +15,7 @@ public class EventBusTests
     [InlineData(TopicType.Explicit, "v1", null)]
     [InlineData(TopicType.Explicit, null, "suffix")]
     [InlineData(TopicType.Explicit, "v1", "suffix")]
-    public async Task EventBus_Should_Invoke_Event_Handlers(TopicType topicType, string prefix, string suffix)
+    public async Task EventBus_Should_Invoke_Event_Handlers(TopicType topicType, string? prefix, string? suffix)
     {
         // Topic name
         var topicName = topicType == TopicType.Explicit ? "my-topic" : null;
@@ -51,7 +51,7 @@ public class EventBusTests
     [InlineData(TopicType.Explicit, "v1", null)]
     [InlineData(TopicType.Explicit, null, "suffix")]
     [InlineData(TopicType.Explicit, "v1", "suffix")]
-    public void EventBus_Should_Remove_Event_Handlers(TopicType topicType, string prefix, string suffix)
+    public void EventBus_Should_Remove_Event_Handlers(TopicType topicType, string? prefix, string? suffix)
     {
         // Topic name
         var topicName = topicType == TopicType.Explicit ? "my-topic" : null;

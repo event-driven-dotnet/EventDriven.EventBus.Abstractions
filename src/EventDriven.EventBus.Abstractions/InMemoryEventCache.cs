@@ -157,4 +157,49 @@ public class InMemoryEventCache : IEventCache
         Cache.Add(@event.Id, handling);
         return Task.CompletedTask;
     }
+
+    /// <inheritdoc />
+    public Task UpdateEventAsync(IntegrationEvent @event, string? handlerTypeName = null, string? errorMessage = null)
+    {
+        // Return if cache not enabled
+        if (!EventCacheOptions.EnableEventCache) return Task.CompletedTask;
+        
+        // Remove existing event
+        Cache.Remove(@event.Id);
+        
+        // Add new event
+        var handling = new EventHandling
+        {
+            EventId = @event.Id,
+            IntegrationEvent = @event,
+            EventHandledTime = DateTime.UtcNow,
+            EventHandledTimeout = EventCacheOptions.EventCacheTimeout
+        };
+        if (!string.IsNullOrWhiteSpace(handlerTypeName))
+        {
+            handling.Handlers.Add(handlerTypeName, new HandlerInfo
+            {
+                HasError = !string.IsNullOrWhiteSpace(errorMessage),
+                ErrorMessage = !string.IsNullOrWhiteSpace(errorMessage)
+                    ? errorMessage : null
+            });
+        }
+        Cache[@event.Id] = handling;
+        return Task.CompletedTask;
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> HasBeenHandledPersistEventAsync(IntegrationEvent @event, string? handlerTypeName = null)
+    {
+        var hasBeenHandled = await HasBeenHandledAsync(@event, handlerTypeName!);
+        if (!hasBeenHandled)
+        {
+            if (Cache.ContainsKey(@event.Id))
+                await UpdateEventAsync(@event, handlerTypeName);
+            else
+                await AddEventAsync(@event, handlerTypeName);
+        }
+
+        return hasBeenHandled;
+    }
 }
