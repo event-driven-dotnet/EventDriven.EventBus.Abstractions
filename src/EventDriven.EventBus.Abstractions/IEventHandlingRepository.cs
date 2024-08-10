@@ -32,8 +32,37 @@ public interface IEventHandlingRepository<TIntegrationEvent>
     /// <param name="cancellationToken">A <see cref="CancellationToken" /> that can be used to cancel the operation.</param>
     /// <returns>
     /// A <see cref="Task" /> that will complete when the operation has completed.
+    /// Task contains an EventWrapper of TIntegrationEvent.
     /// </returns>
-    Task AddEventAsync(string appName, string eventId, EventHandling eventHandling,
+    Task<EventWrapper<TIntegrationEvent>> AddEventAsync(string appName, string eventId, EventHandling eventHandling,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Update an event handling in the event state store.
+    /// </summary>
+    /// <param name="appName">App name.</param>
+    /// <param name="eventId">Event id.</param>
+    /// <param name="eventHandling">Event handling.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken" /> that can be used to cancel the operation.</param>
+    /// <returns>
+    /// A <see cref="Task" /> that will complete when the operation has completed.
+    /// Task contains an EventWrapper of TIntegrationEvent.
+    /// </returns>
+    Task<EventWrapper<TIntegrationEvent>> UpdateEventAsync(string appName, string eventId, EventHandling eventHandling,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Add or update an event handling in the event state store.
+    /// </summary>
+    /// <param name="appName">App name.</param>
+    /// <param name="eventId">Event id.</param>
+    /// <param name="eventHandling">Event handling.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken" /> that can be used to cancel the operation.</param>
+    /// <returns>
+    /// A <see cref="Task" /> that will complete when the operation has completed.
+    /// Task contains an EventWrapper of TIntegrationEvent.
+    /// </returns>
+    Task<EventWrapper<TIntegrationEvent>> AddOrUpdateEventAsync(string appName, string eventId, EventHandling eventHandling,
         CancellationToken cancellationToken = default);
 
     /// <summary>

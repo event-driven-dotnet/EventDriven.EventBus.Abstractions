@@ -11,7 +11,7 @@ public class TopicInfoAttributeTests
     [InlineData("some-topic", "some-prefix", "some-suffix")]
     [InlineData("some-topic", "", "some-suffix")]
     [InlineData("some-topic", "some-prefix", null)]
-    public void CreateInstance_TopicInfoAttribute_ShouldBeCreate(string name, string prefix, string suffix)
+    public void CreateInstance_TopicInfoAttribute_ShouldBeCreate(string? name, string? prefix, string? suffix)
     {
         // act
         var attribute = new TopicInfoAttribute(name, prefix, suffix);
