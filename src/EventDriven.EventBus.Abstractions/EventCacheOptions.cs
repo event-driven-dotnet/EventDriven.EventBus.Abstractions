@@ -8,6 +8,11 @@ namespace EventDriven.EventBus.Abstractions;
 public class EventCacheOptions
 {
     /// <summary>
+    /// Application name.
+    /// </summary>
+    public string AppName { get; set; } = null!;
+
+    /// <summary>
     /// True to enable event cache for idempotency. Defaults to true.
     /// </summary>
     public bool EnableEventCache { get; set; } = true;
