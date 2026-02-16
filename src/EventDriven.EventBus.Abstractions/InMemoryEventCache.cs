@@ -13,7 +13,7 @@ namespace EventDriven.EventBus.Abstractions;
 public class InMemoryEventCache : IEventCache
 {
     private readonly AsyncNonKeyedLocker _syncRoot = new();
-    
+
     /// <summary>
     /// Event cache options.
     /// </summary>
@@ -66,23 +66,21 @@ public class InMemoryEventCache : IEventCache
     /// <returns>Task that will complete when the operation has completed.</returns>
     protected virtual async Task CleanupEventCacheAsync()
     {
-        using (await _syncRoot.LockAsync(CancellationToken))
+        using var _ = await _syncRoot.LockAsync(CancellationToken);
+        // End timer and exit if cache cleanup disabled or cancellation pending
+        if (!EventCacheOptions.EnableEventCacheCleanup || CancellationToken.IsCancellationRequested)
         {
-            // End timer and exit if cache cleanup disabled or cancellation pending
-            if (!EventCacheOptions.EnableEventCacheCleanup || CancellationToken.IsCancellationRequested)
-            {
-                if (CleanupTimer != null) await CleanupTimer.DisposeAsync();
-                return;
-            }
-
-            // Remove expired events without errors
-            var expired = Cache
-                .Where(kvp =>
-                    DateTime.UtcNow > kvp.Value.EventHandledTime + kvp.Value.EventHandledTimeout
-                    && !kvp.Value.Handlers.Any(h => h.Value.HasError));
-            foreach (var keyValuePair in expired)
-                Cache.Remove(keyValuePair.Key);
+            if (CleanupTimer != null) await CleanupTimer.DisposeAsync();
+            return;
         }
+
+        // Remove expired events without errors
+        var expired = Cache
+            .Where(kvp =>
+                DateTime.UtcNow > kvp.Value.EventHandledTime + kvp.Value.EventHandledTimeout
+                && !kvp.Value.Handlers.Any(h => h.Value.HasError));
+        foreach (var keyValuePair in expired)
+            Cache.Remove(keyValuePair.Key);
     }
 
     /// <summary>
@@ -91,23 +89,21 @@ public class InMemoryEventCache : IEventCache
     /// <returns>Task that will complete when the operation has completed.</returns>
     protected virtual async Task CleanupEventCacheErrorsAsync()
     {
-        using (await _syncRoot.LockAsync(CancellationToken))
+        using var _ = await _syncRoot.LockAsync(CancellationToken);
+        // End timer and exit if cache cleanup disabled or cancellation pending
+        if (!EventCacheOptions.EnableEventCacheCleanup || CancellationToken.IsCancellationRequested)
         {
-            // End timer and exit if cache cleanup disabled or cancellation pending
-            if (!EventCacheOptions.EnableEventCacheCleanup || CancellationToken.IsCancellationRequested)
-            {
-                if (ErrorsCleanupTimer != null) await ErrorsCleanupTimer.DisposeAsync();
-                return;
-            }
-
-            // Remove expired events with errors
-            var expiredWithErrors = Cache
-                .Where(kvp =>
-                    DateTime.UtcNow > kvp.Value.EventHandledTime + kvp.Value.EventHandledTimeout
-                    && kvp.Value.Handlers.Any(h => h.Value.HasError));
-            foreach (var keyValuePair in expiredWithErrors)
-                Cache.Remove(keyValuePair.Key);
+            if (ErrorsCleanupTimer != null) await ErrorsCleanupTimer.DisposeAsync();
+            return;
         }
+
+        // Remove expired events with errors
+        var expiredWithErrors = Cache
+            .Where(kvp =>
+                DateTime.UtcNow > kvp.Value.EventHandledTime + kvp.Value.EventHandledTimeout
+                && kvp.Value.Handlers.Any(h => h.Value.HasError));
+        foreach (var keyValuePair in expiredWithErrors)
+            Cache.Remove(keyValuePair.Key);
     }
 
     /// <inheritdoc />
@@ -115,7 +111,7 @@ public class InMemoryEventCache : IEventCache
     {
         // Return false if not enabled
         if (!EventCacheOptions.EnableEventCache) return Task.FromResult(false);
-        
+
         // Return true if event exists, is not expired, and handler has no error
         var exists = Cache.TryGetValue(@event.Id, out var handling);
         var expired = handling != null &&
@@ -133,10 +129,10 @@ public class InMemoryEventCache : IEventCache
     {
         // Return if cache not enabled
         if (!EventCacheOptions.EnableEventCache) return Task.CompletedTask;
-        
+
         // Remove existing event
         Cache.Remove(@event.Id);
-        
+
         // Add new event
         var handling = new EventHandling
         {
@@ -163,10 +159,10 @@ public class InMemoryEventCache : IEventCache
     {
         // Return if cache not enabled
         if (!EventCacheOptions.EnableEventCache) return Task.CompletedTask;
-        
+
         // Remove existing event
         Cache.Remove(@event.Id);
-        
+
         // Add new event
         var handling = new EventHandling
         {
